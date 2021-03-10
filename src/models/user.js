@@ -37,7 +37,6 @@ const userSchema = new mongoose.Schema(
     age: {
       type: Number,
       required: true,
-      default: 0,
       validate(value) {
         if (value < 0) {
           throw new Error("Age must be a positive number");
@@ -52,16 +51,6 @@ const userSchema = new mongoose.Schema(
         },
       },
     ],
-    avatar: {
-      type: Buffer,
-    },
-    // images: [
-    //   {
-    //     image: {
-    //       type: Buffer,
-    //     },
-    //   },
-    // ],
   },
   {
     timestamps: true,
@@ -110,7 +99,7 @@ userSchema.pre("save", async function (next) {
 });
 userSchema.pre("remove", async function (next) {
   const user = this;
-  await Post.deleteMany({ owner: user._id });
+  await Post.deleteMany({ creator: user._id });
   next();
 });
 const User = mongoose.model("User", userSchema);
