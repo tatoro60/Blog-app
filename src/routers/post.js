@@ -46,7 +46,7 @@ router.post("/posts", auth, upload.array("upload", 10), async (req, res) => {
   }
 });
 // Add images into post
-router.post("/posts/:id/images" , upload.array("images",3), async (req,res)=>{
+router.post("/posts/:id/images" , auth, upload.array("images",3), async (req,res)=>{
   try {
     const post = await Post.findOne({
       _id: req.params.id,
@@ -67,8 +67,6 @@ router.post("/posts/:id/images" , upload.array("images",3), async (req,res)=>{
   } catch (error) {
     res.status(500).send()
   }
-},(error,req,res,next)=>{
-  res.status(400).send({error : error.message})
 })
 // Update images and description in post
 router.patch("/posts/:id", auth, upload.single('upload'), async (req, res) => {
@@ -104,19 +102,15 @@ router.patch("/posts/:id", auth, upload.single('upload'), async (req, res) => {
 // Delete images from post
 router.delete("/posts/:id/:index", auth, async (req, res) => {
   try {
-    console.log(12)
     const post = await Post.findOne({
       _id: req.params.id,
       creator: req.user._id,
     });
-    console.log(89)
     if(!post || (req.params.index>=post.images.length || req.params.index < 0)){
         return res.status(404).send();
     }
-    console.log(45)
     post.images.splice(req.params.index, 1);
     await post.save();
-    console.log(65)
     res.send();
   } catch (error) {
     res.status(500).send()
@@ -135,7 +129,7 @@ router.get("/posts/top", auth,async (req, res) => {
     res.status(500).send();
   }
 });
-// Get my posts  + sorting pagination
+// Get my posts  + sorting pagination + search by description
 router.get("/posts/me", auth, async (req, res) => {
   const sort = {};
   if (req.query.sortBy) {
@@ -153,25 +147,16 @@ router.get("/posts/me", auth, async (req, res) => {
         },
       })
       .execPopulate();
-    res.send(req.user.posts);
-  } catch (e) {
-    res.status(500).send();
-  }
-});
-// Search by description
-router.get("/posts/me", auth, async (req, res) => {
-  try {
-    const posts = Post.find({ creator : req.user._id});
     if(req.query.search){
-      posts.filter((post)=>{
+      req.user.posts.filter((post)=>{
         if(post.description.includes(req.query.search)){
           return true;
         }
         return false;
       })
     }
-    res.send(posts)
 
+    res.send(req.user.posts);
   } catch (e) {
     res.status(500).send();
   }
