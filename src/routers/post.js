@@ -15,6 +15,7 @@ const upload = multer({
     cb(undefined, true);
   },
 });
+
 // Get all posts without auth
 router.get("/posts", async (req, res) => {
   try {
@@ -25,6 +26,7 @@ router.get("/posts", async (req, res) => {
     res.status(500).send();
   }
 });
+
 // Crete post  
 router.post("/posts", auth, upload.array("upload", 10), async (req, res) => {
   const post = new Post({
@@ -45,6 +47,7 @@ router.post("/posts", auth, upload.array("upload", 10), async (req, res) => {
     res.status(400).send(e);
   }
 });
+
 // Add images into post
 router.post("/posts/:id/images" , auth, upload.array("images",3), async (req,res)=>{
   try {
@@ -68,6 +71,7 @@ router.post("/posts/:id/images" , auth, upload.array("images",3), async (req,res
     res.status(500).send()
   }
 })
+
 // Update images and description in post
 router.patch("/posts/:id", auth, upload.single('upload'), async (req, res) => {
   try {
@@ -99,6 +103,7 @@ router.patch("/posts/:id", auth, upload.single('upload'), async (req, res) => {
   }
 }
 );
+
 // Delete images from post
 router.delete("/posts/:id/:index", auth, async (req, res) => {
   try {
@@ -116,6 +121,7 @@ router.delete("/posts/:id/:index", auth, async (req, res) => {
     res.status(500).send()
   }
 });
+
 // Get top recently created posts by query limit
 router.get("/posts/top", auth,async (req, res) => {
   try {
@@ -129,6 +135,7 @@ router.get("/posts/top", auth,async (req, res) => {
     res.status(500).send();
   }
 });
+
 // Get my posts  + sorting pagination + search by description
 router.get("/posts/me", auth, async (req, res) => {
   const sort = {};
@@ -161,6 +168,7 @@ router.get("/posts/me", auth, async (req, res) => {
     res.status(500).send();
   }
 });
+
 // Get Individual post
 router.get("/posts/:id", auth, async (req, res) => {
   const _id = req.params.id;
@@ -175,6 +183,7 @@ router.get("/posts/:id", auth, async (req, res) => {
     res.status(500).send();
   }
 });
+
 // Delete post
 router.delete("/posts/:id", auth, async (req, res) => {
   try {
@@ -190,4 +199,6 @@ router.delete("/posts/:id", auth, async (req, res) => {
     res.status(500).send(error);
   }
 });
+
+
 module.exports = router;
